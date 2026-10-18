@@ -1,6 +1,11 @@
 global:
   scrape_interval: 5s
+  evaluation_interval: 5s
+
 scrape_configs:
-  - job_name: demo
+  - job_name: observability-lab
+    metrics_path: /metrics
     static_configs:
       - targets: ["app:8080"]
+        labels:
+          app: observability-lab

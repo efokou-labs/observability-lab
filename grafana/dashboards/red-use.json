@@ -1,9 +1,136 @@
 {
+  "uid": "red-use",
   "title": "RED and USE",
+  "timezone": "browser",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "tags": ["observability-lab", "red", "use"],
+  "templating": { "list": [] },
+  "time": { "from": "now-15m", "to": "now" },
   "panels": [
-    {"type": "stat", "title": "Rate", "targets": [{"expr": "sum(rate(demo_requests_total[1m]))"}]},
-    {"type": "stat", "title": "Errors", "targets": [{"expr": "sum(rate(demo_requests_total{code=\"500\"}[1m]))"}]},
-    {"type": "stat", "title": "Duration", "targets": [{"expr": "histogram_quantile(0.99, sum(rate(demo_request_seconds_bucket[5m])) by (le))"}]}
-  ],
-  "schemaVersion": 39
+    {
+      "id": 1,
+      "type": "stat",
+      "title": "Rate",
+      "gridPos": { "h": 6, "w": 6, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(demo_requests_total[1m]))",
+          "legendFormat": "rps"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "reqps" }
+      }
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "Errors",
+      "gridPos": { "h": 6, "w": 6, "x": 6, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(demo_requests_total{code=~\"5..\"}[1m]))",
+          "legendFormat": "errors"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Duration p99",
+      "gridPos": { "h": 6, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.99, sum(rate(demo_request_seconds_bucket[5m])) by (le))",
+          "legendFormat": "p99"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s" }
+      }
+    },
+    {
+      "id": 4,
+      "type": "timeseries",
+      "title": "CPU",
+      "gridPos": { "h": 7, "w": 8, "x": 0, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "demo_cpu_seconds",
+          "legendFormat": "cpu"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "timeseries",
+      "title": "Memory",
+      "gridPos": { "h": 7, "w": 8, "x": 8, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "demo_rss_bytes",
+          "legendFormat": "rss"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "bytes" }
+      }
+    },
+    {
+      "id": 6,
+      "type": "gauge",
+      "title": "Open FDs",
+      "gridPos": { "h": 7, "w": 4, "x": 16, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "demo_open_fds",
+          "legendFormat": "fds"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "min": 0, "unit": "short" }
+      }
+    },
+    {
+      "id": 7,
+      "type": "stat",
+      "title": "In flight",
+      "gridPos": { "h": 7, "w": 4, "x": 20, "y": 6 },
+      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "demo_in_flight",
+          "legendFormat": "in-flight"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "logs",
+      "title": "Logs",
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 13 },
+      "datasource": { "type": "loki", "uid": "loki" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "{job=\"observability-lab\"}"
+        }
+      ]
+    }
+  ]
 }
